@@ -65,7 +65,7 @@ g++ -std=c++17 InternGrow_CGPAPlanner.cpp -o cgpa_planner
 Contact: interngrow.official@gmail.com
 
 ## 👤 Author
-[Aapka Naam Yahan Likhen]
+[SAMREEN JAVEED]
 
 ## 📄 License
 This project was built for educational purposes as part of the InternGrow internship program.
