@@ -1,71 +1,79 @@
-# INTERNGROW_CGPAPLANNER
+# InternGrow_CGPAPlanner
 
-Automated Semester CGPA Planner built in C++ as part of the **InternGrow C++ Programming Track (Task 1)**.
+## 📌 Project Title
+Automated Semester CGPA Planner
 
-## 📋 Overview
-This console-based application allows students to input course details, grades, and credit hours to calculate individual semester GPA and cumulative CGPA. It also includes a **predictive simulation feature** that calculates the minimum GPA required in upcoming semesters to reach a target CGPA.
+## 📖 Description
+A C++ console application that takes course names, letter grades, and credit
+hours as input, then calculates:
+- Individual **Semester GPA** for each semester
+- **Cumulative CGPA** across all entered semesters
 
-## ✨ Features
-- **Course Input**: Add multiple courses per semester with grade and credit hours
-- **Grade Validation**: Supports standard 4.0 grade scale (A+, A, A-, B+, B, B-, C+, C, C-, D+, D, F)
-- **Semester GPA Calculation**: Automatically computes GPA for each semester
-- **Cumulative CGPA Tracking**: Tracks CGPA across multiple semesters
-- **Detailed Report**: Full breakdown of courses, grades, credit hours, and grade points
+### 🚀 Upgrade Feature — Predictive CGPA Simulation
+After computing your current CGPA, the program can predict the **minimum
+average GPA** you need to score in your upcoming semesters (based on planned
+credit hours) in order to reach a **target CGPA** you specify. If the target
+is mathematically impossible, it tells you the maximum CGPA you can still
+achieve.
 
-### 🚀 Upgrade Feature: Predictive Simulation
-Calculates the **minimum average GPA** needed in upcoming semesters to achieve a target CGPA, given:
-- Current CGPA and credits earned so far
-- Target CGPA
-- Planned future credit hours
+## 🛠️ Tech Stack
+- Language: C++ (C++17)
+- Compiler: g++ / any standard C++ compiler
 
-Handles three scenarios:
-- ✅ Target is achievable — shows required GPA
-- ⚠️ Target already achieved/exceeded
-- ❌ Target not achievable even with a perfect 4.0 GPA
-
-## 🛠️ Grade Scale (4.0 System)
-| Grade | Points |
-|-------|--------|
-| A+/A  | 4.0    |
-| A-    | 3.7    |
-| B+    | 3.3    |
-| B     | 3.0    |
-| B-    | 2.7    |
-| C+    | 2.3    |
-| C     | 2.0    |
-| C-    | 1.7    |
-| D+    | 1.3    |
-| D     | 1.0    |
-| F     | 0.0    |
-
-## 💻 How to Run
-
-### Compile
-```bash
-g++ -std=c++17 InternGrow_CGPAPlanner.cpp -o cgpa_planner
+## 📂 File Structure
+```
+InternGrow_CGPAPlanner/
+├── Task1_CGPA_Planner.cpp
+└── README.md
 ```
 
-### Run
+## ⚙️ How to Compile & Run
 ```bash
-./cgpa_planner
+g++ -std=c++17 -o CGPAPlanner Task1_CGPA_Planner.cpp
+./CGPAPlanner
 ```
-(On Windows: `cgpa_planner.exe`)
+On Windows (MinGW):
+```bash
+g++ -std=c++17 -o CGPAPlanner.exe Task1_CGPA_Planner.cpp
+CGPAPlanner.exe
+```
 
-## 📖 Usage
-1. **Add a New Semester** – Enter courses with grades and credit hours
-2. **View Full CGPA Report** – See semester-wise GPA and overall CGPA
-3. **Predict Required GPA** – Enter target CGPA and planned future credits to see what GPA you need
+## ▶️ How to Use
+1. Enter the number of semesters you want to record.
+2. For each semester, enter the number of courses, then for each course:
+   - Course name
+   - Letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D, F)
+   - Credit hours
+3. The program displays each Semester GPA and the overall Cumulative CGPA.
+4. Choose `y` when prompted to run the **Predictive CGPA Simulation**:
+   - Enter your target CGPA
+   - Enter total planned credit hours for upcoming semesters
+   - The program tells you the GPA you must maintain to hit that target.
 
-## 🧩 Tech Stack
-- **Language**: C++ (C++17)
-- **Concepts Used**: Structs, Classes, STL (vector, map), Input Validation
+## 📊 Sample Output
+```
+===== Automated Semester CGPA Planner =====
+Enter number of completed semesters: 1
 
-## 📌 Built For
-**InternGrow C++ Programming Track** — Module 1, Task 1
-Contact: interngrow.official@gmail.com
+--- Semester 1 ---
+Enter number of courses: 2
+...
+-> Semester 1 GPA: 3.50 (Credits: 6)
+
+===== Summary =====
+Semester 1 GPA: 3.50
+Cumulative CGPA: 3.50
+
+Run predictive CGPA simulation? (y/n): y
+Enter your TARGET CGPA: 3.80
+Enter TOTAL credit hours planned for upcoming semesters: 12
+You need an average GPA of 4.00 in your upcoming 12 credit hours
+to reach a CGPA of 3.80.
+```
 
 ## 👤 Author
-[SAMREEN JAVEED]
+InternGrow C++ Programming Track — Module 1, Task 1
 
 ## 📄 License
-This project was built for educational purposes as part of the InternGrow internship program.
+This project was developed as part of the InternGrow internship program for
+educational purposes.
