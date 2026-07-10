@@ -43,9 +43,9 @@ double letterToPoint(const string &grade) {
 double calculateSemesterGPA(Semester &sem) {
     double totalPoints = 0.0;
     int totalCredits = 0;
-    for (auto &c : sem.courses) {
-        totalPoints += c.gradePoint * c.creditHours;
-        totalCredits += c.creditHours;
+    for (size_t i = 0; i < sem.courses.size(); i++) {
+        totalPoints += sem.courses[i].gradePoint * sem.courses[i].creditHours;
+        totalCredits += sem.courses[i].creditHours;
     }
     sem.totalCredits = totalCredits;
     sem.semesterGPA = (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
@@ -55,15 +55,14 @@ double calculateSemesterGPA(Semester &sem) {
 double calculateCGPA(const vector<Semester> &semesters) {
     double totalPoints = 0.0;
     int totalCredits = 0;
-    for (auto &sem : semesters) {
-        for (auto &c : sem.courses) {
-            totalPoints += c.gradePoint * c.creditHours;
-            totalCredits += c.creditHours;
+    for (size_t s = 0; s < semesters.size(); s++) {
+        for (size_t i = 0; i < semesters[s].courses.size(); i++) {
+            totalPoints += semesters[s].courses[i].gradePoint * semesters[s].courses[i].creditHours;
+            totalCredits += semesters[s].courses[i].creditHours;
         }
     }
     return (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
 }
-
 Semester inputSemester(int semNumber) {
     Semester sem;
     int numCourses;
@@ -105,8 +104,7 @@ Semester inputSemester(int semNumber) {
 void predictiveSimulation(const vector<Semester> &completedSemesters) {
     double currentCGPA = calculateCGPA(completedSemesters);
     int completedCredits = 0;
-    for (auto &s : completedSemesters) completedCredits += s.totalCredits;
-
+  for (size_t i = 0; i < completedSemesters.size(); i++) completedCredits += completedSemesters[i].totalCredits;
     cout << "\n=== Predictive CGPA Simulation ===\n";
     cout << "Current CGPA: " << fixed << setprecision(2) << currentCGPA << "\n";
     cout << "Completed Credit Hours: " << completedCredits << "\n";
