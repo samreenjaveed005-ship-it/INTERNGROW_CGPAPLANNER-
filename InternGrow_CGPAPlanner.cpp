@@ -1,296 +1,181 @@
 /*
-    InternGrow C++ Programming Track - Task 1
-    Automated Semester CGPA Planner
-    ---------------------------------------------------------------
-    Features:
-    - Take input for courses, grade scales, credit hours
-    - Compute individual semester GPA
-    - Compute cumulative CGPA across multiple semesters
-    - Upgrade Feature: Predictive simulation - calculates the
-      minimum GPA needed in upcoming semesters to hit a target CGPA
+    InternGrow C++ Programming Track
+    TASK 1: Automated Semester CGPA Planner
+    Feature: Takes course grades & credit hours, computes semester GPA and
+             cumulative CGPA.
+    Upgrade: Predictive simulation - calculates minimum GPA needed in
+             upcoming semesters to reach a target CGPA.
 */
 
 #include <iostream>
 #include <vector>
-#include <string>
 #include <iomanip>
-#include <map>
-
+#include <string>
 using namespace std;
 
-// -----------------------------------------------------------------
-// Grade scale mapping (4.0 scale - standard university system)
-// -----------------------------------------------------------------
-map<string, double> gradeScale = {
-    {"A+", 4.0}, {"A", 4.0}, {"A-", 3.7},
-    {"B+", 3.3}, {"B", 3.0}, {"B-", 2.7},
-    {"C+", 2.3}, {"C", 2.0}, {"C-", 1.7},
-    {"D+", 1.3}, {"D", 1.0},
-    {"F", 0.0}
-};
-
-// -----------------------------------------------------------------
-// Course structure
-// -----------------------------------------------------------------
 struct Course {
     string name;
-    string grade;
-    double creditHours;
-    double gradePoints;
-
-    Course(string n, string g, double ch) : name(n), grade(g), creditHours(ch) {
-        gradePoints = getGradePoint(g) * ch;
-    }
-
-    static double getGradePoint(const string& g) {
-        auto it = gradeScale.find(g);
-        if (it != gradeScale.end()) return it->second;
-        return -1; // invalid grade marker
-    }
+    double gradePoint;   // e.g. A=4.0, B=3.0 ...
+    int creditHours;
 };
 
-// -----------------------------------------------------------------
-// Semester structure - holds courses and computes semester GPA
-// -----------------------------------------------------------------
 struct Semester {
-    string semesterName;
     vector<Course> courses;
-
-    double getTotalCredits() const {
-        double total = 0;
-        for (const auto& c : courses) total += c.creditHours;
-        return total;
-    }
-
-    double getTotalGradePoints() const {
-        double total = 0;
-        for (const auto& c : courses) total += c.gradePoints;
-        return total;
-    }
-
-    double getSemesterGPA() const {
-        double credits = getTotalCredits();
-        if (credits == 0) return 0.0;
-        return getTotalGradePoints() / credits;
-    }
+    double semesterGPA = 0.0;
+    int totalCredits = 0;
 };
 
-// -----------------------------------------------------------------
-// CGPA Planner - manages all semesters and computes cumulative CGPA
-// -----------------------------------------------------------------
-class CGPAPlanner {
-private:
-    vector<Semester> semesters;
-
-public:
-    void addSemester(const Semester& s) {
-        semesters.push_back(s);
-    }
-
-    double getCumulativeCredits() const {
-        double total = 0;
-        for (const auto& s : semesters) total += s.getTotalCredits();
-        return total;
-    }
-
-    double getCumulativeGradePoints() const {
-        double total = 0;
-        for (const auto& s : semesters) total += s.getTotalGradePoints();
-        return total;
-    }
-
-    double getCGPA() const {
-        double credits = getCumulativeCredits();
-        if (credits == 0) return 0.0;
-        return getCumulativeGradePoints() / credits;
-    }
-
-    void printReport() const {
-        cout << "\n===================================================\n";
-        cout << "              CGPA PROFILE REPORT\n";
-        cout << "===================================================\n";
-
-        for (const auto& s : semesters) {
-            cout << "\n--- " << s.semesterName << " ---\n";
-            cout << left << setw(20) << "Course" << setw(10) << "Grade"
-                 << setw(10) << "Credits" << "Grade Points\n";
-            cout << string(50, '-') << "\n";
-            for (const auto& c : s.courses) {
-                cout << left << setw(20) << c.name << setw(10) << c.grade
-                     << setw(10) << c.creditHours << fixed << setprecision(2)
-                     << c.gradePoints << "\n";
-            }
-            cout << "Semester GPA: " << fixed << setprecision(3)
-                 << s.getSemesterGPA() << " (Credits: " << s.getTotalCredits() << ")\n";
-        }
-
-        cout << "\n===================================================\n";
-        cout << "Cumulative Credits     : " << getCumulativeCredits() << "\n";
-        cout << "Cumulative Grade Points: " << fixed << setprecision(2)
-             << getCumulativeGradePoints() << "\n";
-        cout << "CURRENT CGPA            : " << fixed << setprecision(3)
-             << getCGPA() << "\n";
-        cout << "===================================================\n";
-    }
-
-    // ---------------------------------------------------------
-    // UPGRADE FEATURE: Predictive Simulation
-    // Calculates minimum average GPA needed in upcoming semesters
-    // to reach a target CGPA, given planned future credit hours.
-    // ---------------------------------------------------------
-    void predictRequiredGPA(double targetCGPA, double futureCredits) const {
-        double currentCredits = getCumulativeCredits();
-        double currentPoints = getCumulativeGradePoints();
-        double totalFutureCredits = currentCredits + futureCredits;
-
-        double requiredTotalPoints = targetCGPA * totalFutureCredits;
-        double requiredFuturePoints = requiredTotalPoints - currentPoints;
-
-        if (futureCredits <= 0) {
-            cout << "\nInvalid future credit hours entered.\n";
-            return;
-        }
-
-        double requiredGPA = requiredFuturePoints / futureCredits;
-
-        cout << "\n=========== PREDICTIVE SIMULATION ===========\n";
-        cout << "Current CGPA          : " << fixed << setprecision(3) << getCGPA() << "\n";
-        cout << "Current Credits Earned: " << currentCredits << "\n";
-        cout << "Target CGPA           : " << targetCGPA << "\n";
-        cout << "Planned Future Credits: " << futureCredits << "\n";
-        cout << "-----------------------------------------------\n";
-
-        if (requiredGPA > 4.0) {
-            cout << "NOT ACHIEVABLE: Even a perfect 4.0 GPA in all\n";
-            cout << "remaining semesters cannot reach this target.\n";
-            cout << "Maximum possible CGPA with " << futureCredits
-                 << " more credits at 4.0 GPA: "
-                 << fixed << setprecision(3)
-                 << ((currentPoints + (4.0 * futureCredits)) / totalFutureCredits) << "\n";
-        } else if (requiredGPA < 0.0) {
-            cout << "Target already achieved / exceeded!\n";
-            cout << "You could get 0.0 GPA in remaining credits and still\n";
-            cout << "meet the target (not recommended!).\n";
-        } else {
-            cout << "You need an average GPA of at least: "
-                 << fixed << setprecision(3) << requiredGPA
-                 << " in your upcoming " << futureCredits << " credit hours\n";
-            cout << "to achieve your target CGPA of " << targetCGPA << ".\n";
-        }
-        cout << "===============================================\n";
-    }
-};
-
-// -----------------------------------------------------------------
-// Input helper: validates grade against grade scale
-// -----------------------------------------------------------------
-bool isValidGrade(const string& g) {
-    return gradeScale.find(g) != gradeScale.end();
+// Converts a letter grade to a grade point (standard 4.0 scale)
+double letterToPoint(const string &grade) {
+    if (grade == "A+" || grade == "A")  return 4.0;
+    if (grade == "A-") return 3.7;
+    if (grade == "B+") return 3.3;
+    if (grade == "B")  return 3.0;
+    if (grade == "B-") return 2.7;
+    if (grade == "C+") return 2.3;
+    if (grade == "C")  return 2.0;
+    if (grade == "C-") return 1.7;
+    if (grade == "D")  return 1.0;
+    if (grade == "F")  return 0.0;
+    return -1.0; // invalid
 }
 
-void printGradeScale() {
-    cout << "\nAvailable Grades: A+, A, A-, B+, B, B-, C+, C, C-, D+, D, F\n";
-    cout << "(4.0 Scale: A+/A=4.0, A-=3.7, B+=3.3, B=3.0, B-=2.7,\n";
-    cout << " C+=2.3, C=2.0, C-=1.7, D+=1.3, D=1.0, F=0.0)\n";
+double calculateSemesterGPA(Semester &sem) {
+    double totalPoints = 0.0;
+    int totalCredits = 0;
+    for (auto &c : sem.courses) {
+        totalPoints += c.gradePoint * c.creditHours;
+        totalCredits += c.creditHours;
+    }
+    sem.totalCredits = totalCredits;
+    sem.semesterGPA = (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
+    return sem.semesterGPA;
 }
 
-Semester takeSemesterInput(const string& semName) {
+double calculateCGPA(const vector<Semester> &semesters) {
+    double totalPoints = 0.0;
+    int totalCredits = 0;
+    for (auto &sem : semesters) {
+        for (auto &c : sem.courses) {
+            totalPoints += c.gradePoint * c.creditHours;
+            totalCredits += c.creditHours;
+        }
+    }
+    return (totalCredits == 0) ? 0.0 : (totalPoints / totalCredits);
+}
+
+Semester inputSemester(int semNumber) {
     Semester sem;
-    sem.semesterName = semName;
-
     int numCourses;
-    cout << "\nEnter number of courses in " << semName << ": ";
+    cout << "\n--- Semester " << semNumber << " ---\n";
+    cout << "Enter number of courses: ";
     cin >> numCourses;
-
-    printGradeScale();
+    cin.ignore();
 
     for (int i = 0; i < numCourses; i++) {
-        string courseName, grade;
-        double credits;
+        Course c;
+        cout << "\nCourse " << (i + 1) << " name: ";
+        getline(cin, c.name);
 
-        cout << "\n-- Course " << (i + 1) << " --\n";
-        cout << "Course Name: ";
-        cin.ignore();
-        getline(cin, courseName);
-
-        do {
-            cout << "Grade Obtained (e.g. A, B+, C-): ";
+        string grade;
+        double point;
+        while (true) {
+            cout << "Enter letter grade (A+,A,A-,B+,B,B-,C+,C,C-,D,F): ";
             cin >> grade;
-            if (!isValidGrade(grade)) {
-                cout << "Invalid grade. Please re-enter from the available list.\n";
-            }
-        } while (!isValidGrade(grade));
+            point = letterToPoint(grade);
+            if (point >= 0) break;
+            cout << "Invalid grade, try again.\n";
+        }
+        c.gradePoint = point;
 
-        cout << "Credit Hours: ";
-        cin >> credits;
+        cout << "Enter credit hours: ";
+        cin >> c.creditHours;
+        cin.ignore();
 
-        sem.courses.push_back(Course(courseName, grade, credits));
+        sem.courses.push_back(c);
     }
-
+    calculateSemesterGPA(sem);
     return sem;
 }
 
-// -----------------------------------------------------------------
-// Main Menu
-// -----------------------------------------------------------------
-void printMenu() {
-    cout << "\n===================================\n";
-    cout << "   InternGrow CGPA Planner\n";
-    cout << "===================================\n";
-    cout << "1. Add a New Semester\n";
-    cout << "2. View Full CGPA Report\n";
-    cout << "3. Predict Required GPA for Target CGPA\n";
-    cout << "0. Exit\n";
-    cout << "Enter choice: ";
+// ---------------- UPGRADE FEATURE ----------------
+// Predictive simulation: given current CGPA (with credits completed so far),
+// a target CGPA, and planned credit hours for upcoming semesters,
+// calculate the minimum average GPA needed in those upcoming semesters.
+void predictiveSimulation(const vector<Semester> &completedSemesters) {
+    double currentCGPA = calculateCGPA(completedSemesters);
+    int completedCredits = 0;
+    for (auto &s : completedSemesters) completedCredits += s.totalCredits;
+
+    cout << "\n=== Predictive CGPA Simulation ===\n";
+    cout << "Current CGPA: " << fixed << setprecision(2) << currentCGPA << "\n";
+    cout << "Completed Credit Hours: " << completedCredits << "\n";
+
+    double targetCGPA;
+    int upcomingCredits;
+    cout << "Enter your TARGET CGPA: ";
+    cin >> targetCGPA;
+    cout << "Enter TOTAL credit hours planned for upcoming semesters: ";
+    cin >> upcomingCredits;
+
+    if (upcomingCredits <= 0) {
+        cout << "Invalid credit hours entered.\n";
+        return;
+    }
+
+    double totalCreditsAfter = completedCredits + upcomingCredits;
+    double requiredTotalPoints = targetCGPA * totalCreditsAfter;
+    double currentTotalPoints = currentCGPA * completedCredits;
+    double neededPoints = requiredTotalPoints - currentTotalPoints;
+    double requiredGPA = neededPoints / upcomingCredits;
+
+    cout << fixed << setprecision(2);
+    if (requiredGPA > 4.0) {
+        cout << "Target CGPA of " << targetCGPA
+             << " is NOT achievable even with a perfect 4.0 GPA in remaining "
+             << upcomingCredits << " credit hours.\n";
+        cout << "Maximum CGPA achievable: "
+             << ((currentTotalPoints + 4.0 * upcomingCredits) / totalCreditsAfter) << "\n";
+    } else if (requiredGPA < 0.0) {
+        cout << "Target is already guaranteed even with 0.0 GPA in upcoming semesters!\n";
+    } else {
+        cout << "You need an average GPA of " << requiredGPA
+             << " in your upcoming " << upcomingCredits
+             << " credit hours to reach a CGPA of " << targetCGPA << ".\n";
+    }
 }
 
 int main() {
-    CGPAPlanner planner;
-    int choice;
-    int semesterCount = 0;
+    vector<Semester> semesters;
+    int numSemesters;
 
-    cout << "Welcome to InternGrow Automated Semester CGPA Planner\n";
+    cout << "===== Automated Semester CGPA Planner =====\n";
+    cout << "Enter number of completed semesters: ";
+    cin >> numSemesters;
 
-    do {
-        printMenu();
-        cin >> choice;
+    for (int i = 1; i <= numSemesters; i++) {
+        Semester s = inputSemester(i);
+        semesters.push_back(s);
+        cout << fixed << setprecision(2);
+        cout << "-> Semester " << i << " GPA: " << s.semesterGPA
+             << " (Credits: " << s.totalCredits << ")\n";
+    }
 
-        switch (choice) {
-            case 1: {
-                semesterCount++;
-                string semName = "Semester " + to_string(semesterCount);
-                cout << "Enter semester name (or press Enter to use \""
-                     << semName << "\"): ";
-                cin.ignore();
-                string customName;
-                getline(cin, customName);
-                if (!customName.empty()) semName = customName;
+    double cgpa = calculateCGPA(semesters);
+    cout << fixed << setprecision(2);
+    cout << "\n===== Summary =====\n";
+    for (size_t i = 0; i < semesters.size(); i++) {
+        cout << "Semester " << (i + 1) << " GPA: " << semesters[i].semesterGPA << "\n";
+    }
+    cout << "Cumulative CGPA: " << cgpa << "\n";
 
-                Semester sem = takeSemesterInput(semName);
-                planner.addSemester(sem);
-                cout << "\n" << semName << " added! GPA: "
-                     << fixed << setprecision(3) << sem.getSemesterGPA() << "\n";
-                break;
-            }
-            case 2:
-                planner.printReport();
-                break;
-            case 3: {
-                double targetCGPA, futureCredits;
-                cout << "\nEnter your target CGPA (e.g. 3.5): ";
-                cin >> targetCGPA;
-                cout << "Enter total planned credit hours in upcoming semesters: ";
-                cin >> futureCredits;
-                planner.predictRequiredGPA(targetCGPA, futureCredits);
-                break;
-            }
-            case 0:
-                cout << "Thank you for using InternGrow CGPA Planner!\n";
-                break;
-            default:
-                cout << "Invalid choice. Try again.\n";
-        }
-    } while (choice != 0);
+    char choice;
+    cout << "\nRun predictive CGPA simulation? (y/n): ";
+    cin >> choice;
+    if (choice == 'y' || choice == 'Y') {
+        predictiveSimulation(semesters);
+    }
 
+    cout << "\nThank you for using the CGPA Planner!\n";
     return 0;
 }
